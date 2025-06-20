@@ -13,7 +13,7 @@ def get_phrase():
         Esta función es parte del Bootcamp de AstroPython y se utiliza para enseñar
         conceptos básicos de Python y colaboración en proyectos.
     """ 
-    return "La RECA la construímos entre todos, todas y todxs para la comunidad de Python en español"
+    return "La RECA la construímos entre todos, todas y todxs para la comunidad de Python en español, A este bootcamp asistieron Kevin,Diana,Alejandra,Edwin,Alexandra,Catalina,Mariana y Dayana "
 
 
 if __name__ == "__main__":
