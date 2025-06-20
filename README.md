@@ -1,11 +1,12 @@
-# Python Bootcamp Example
+# Bootcamp de Python – RED DE ESTUDIANTES DE ASTRONOMÍA DE COLOMBIA
 
-This project is a simple Python bootcamp example that demonstrates how to create a function and test it using pytest. The main function returns a specific phrase, and the project includes a testing suite to ensure the function behaves as expected.
+Este es un proyecto simple que muestra cómo estructurar un proyecto en Python con pruebas unitarias. Contiene una función que devuelve la frase: "La RECA la construímos entre todos".
 
-## Project Structure
+
+## Estructura del Proyecto
 
 ```
-python-bootcamp-example
+Bootcamp_AstroPython/
 ├── src
 │   ├── __init__.py
 │   └── main.py
@@ -20,43 +21,44 @@ python-bootcamp-example
 └── README.md
 ```
 
-## Getting Started
+## Primeros Pasos
 
-To get started with this project, follow these steps:
+Para comenzar con este proyecto, sigue estos pasos:
 
-1. **Clone the repository**:
+1. **Clona el repositorio**:
    ```bash
-   git clone https://github.com/yourusername/python-bootcamp-example.git
-   cd python-bootcamp-example
+   git clone https://github.com/yourusername/Bootcamp_AstroPython.git
+   cd Bootcamp_AstroPython
+
    ```
 
-2. **Install the required dependencies**:
-   It is recommended to use a virtual environment. You can create one using `venv`:
+2. **Instala las dependencias necesarias**:
+   Se recomienda usar un entorno virtual. Puedes crearlo con `venv`:
    ```bash
    python -m venv venv
-   source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+   source venv/bin/activate  # En Windows usa: `venv\Scripts\activate`
    ```
-   Then install the dependencies:
+   Luego instala las dependencias:
    ```bash
    pip install -r requirements.txt
    ```
 
-3. **Run the function**:
-   You can run the function defined in `src/main.py` by executing:
+3. **Ejecuta la función**:
+   Puedes ejecutar la función definida en `src/main.py`  con el siguiente comando: 
    ```bash
    python src/main.py
    ```
 
-4. **Run the tests**:
-   To run the tests, use the following command:
+4. **Ejecuta las pruebas**:
+   Para correr las pruebas, usa el siguiente comando:
    ```bash
    pytest
    ```
 
-## Contributing
+## Contribuciones
 
-Feel free to fork the repository and submit pull requests. Contributions are welcome!
+¡Siéntete libre de hacer un fork del repositorio y enviar pull requests! ¡Todas las contribuciones son bienvenidas!
+## Licencia
 
-## License
+Este proyecto está licenciado bajo la Licencia MIT. Consulta el archivo LICENSE para más detalles.
 
-This project is licensed under the MIT License. See the LICENSE file for more details.
