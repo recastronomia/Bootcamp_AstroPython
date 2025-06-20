@@ -1,5 +1,5 @@
 ![Logo de RECA](images/Logo_RECA.png)
-# Bootcamp de Python 
+# Bootcamp de programación - Aprendiendo sobre GitHub
 
 Este es un proyecto simple que muestra cómo estructurar un proyecto en Python con pruebas unitarias. Contiene una función que devuelve la frase: "La RECA la construímos entre todos".
 
