@@ -58,6 +58,12 @@ Para comenzar con este proyecto, sigue estos pasos:
    pytest
    ```
 
+## Tutoriales
+
+Este proyecto incluye tutoriales para ayudarte a entender los conceptos básicos:
+
+- [Introducción a Python y Git](tutorials/introduccion_python.md)
+
 ## Contribuciones
 
 ¡Siéntete libre de hacer un fork del repositorio y enviar pull requests! ¡Todas las contribuciones son bienvenidas!
