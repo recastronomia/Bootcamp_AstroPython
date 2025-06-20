@@ -50,9 +50,9 @@ git push origin nombre-rama
 
 ###  Ejercicio práctico
 
-Modifica la función `get_phrase()` para que devuelva un mensaje personalizado
-Ejecuta las pruebas para asegurarte de que todo funciona
-Crea una nueva rama y sube tus cambios
+1) Modifica la función `get_phrase()` para que devuelva un mensaje personalizado
+2) Ejecuta las pruebas para asegurarte de que todo funciona
+3) Crea una nueva rama y sube tus cambios
 
 ###  Actualiza la estructura del proyecto en el README para incluir la nueva carpeta:
 ```
