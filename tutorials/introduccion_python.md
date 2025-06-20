@@ -55,7 +55,6 @@ Ejecuta las pruebas para asegurarte de que todo funciona
 Crea una nueva rama y sube tus cambios
 
 ###  Actualiza la estructura del proyecto en el README para incluir la nueva carpeta:
-```markdown
 ```
 Bootcamp_AstroPython/
 ├── src
@@ -74,3 +73,5 @@ Bootcamp_AstroPython/
 ├── requirements.txt
 ├── pytest.ini
 └── README.md
+
+```
