@@ -17,9 +17,11 @@ Bootcamp_AstroPython/
 ├── .github
 │   └── workflows
 │       └── pytest.yml
+├── images
+│   └── Logo_RECA.png
 ├── requirements.txt
 ├── pytest.ini
-└── README.md
+└── [README.md]
 ```
 
 ## Primeros Pasos
