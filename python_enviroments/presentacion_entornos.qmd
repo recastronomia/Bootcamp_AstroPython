@@ -1,0 +1,846 @@
+---
+title: "Entornos Virtuales y Control de Paquetería"
+subtitle: "Bootcamp AstroPython · RECA"
+author: "AstroPython"
+date: today
+execute:
+  enabled: false
+filters:
+  - pyodide
+format:
+  revealjs:
+    theme: dark
+    highlight-style: github-dark
+    code-copy: true
+    code-line-numbers: true
+    slide-number: true
+    chalkboard: true
+    transition: slide
+    toc: true
+    toc-title: "Contenido"
+    toc-depth: 1
+---
+
+# ¿Por qué aislar dependencias?
+
+## ¿Qué es un entorno de Python?
+
+Un entorno es el contexto en el que se ejecuta tu código. Está compuesto por:
+1. Un **intérprete** de Python (ej. Python 3.12).
+2. Una **colección de paquetes** instalados (ej. `numpy`, `astropy`).
+3. Variables y configuraciones del sistema.
+
+Por defecto, Python instala todo en un único directorio global (el sistema base).
+
+## El problema del sistema base
+
+Imagina que tienes dos proyectos en tu computadora:
+
+- **Proyecto A** (2021) necesita `numpy==1.21`
+- **Proyecto B** (2024) necesita `numpy==2.0`
+
+. . .
+
+Si instalas todo en el sistema base, la última instalación sobreescribe a la anterior.
+→ **El Proyecto A dejará de funcionar.** A esto se le llama *Dependency Hell*.
+
+## La solución: Entornos Virtuales
+
+Un entorno virtual es un directorio autónomo que contiene su propia copia del intérprete de Python y su propia carpeta de paquetes.
+
+Son como **burbujas aisladas** para cada proyecto.
+
+```text
+Sistema base (Limpio)
+├── Proyecto A  →  Python 3.9  + numpy 1.21, matplotlib 3.5
+├── Proyecto B  →  Python 3.12 + numpy 2.0,  pandas 2.3
+└── Proyecto C  →  Python 3.10 + astropy 6.0, scipy 1.13
+```
+
+. . .
+
+**Dos beneficios fundamentales:**
+
+1. **Aislamiento:** Instalar, actualizar o borrar paquetes en un proyecto no afecta a los demás.
+2. **Reproducibilidad:** Permite exportar la lista exacta de dependencias para compartir el código.
+
+## Flujo de trabajo general
+
+```
+1. Crear entorno
+       ↓
+2. Activar
+       ↓
+3. Instalar paquetes
+       ↓
+4. Desarrollar
+       ↓
+5. Freezar dependencias
+       ↓
+6. Compartir (requirements.txt / environment.yml)
+```
+
+# Evolución de Python
+
+## ¿Por qué importa la versión?
+
+El lenguaje Python está en constante evolución. Cada nueva versión (3.9, 3.10, 3.11...) introduce:
+1. **Nuevas funcionalidades** (sintaxis más limpia y moderna).
+2. **Mejoras de rendimiento** (optimización del intérprete).
+3. **Deprecación** de código antiguo (limpieza de funciones obsoletas).
+
+. . .
+
+Si intentas correr código moderno (ej. escrito en Python 3.12) en un entorno con Python 3.8, el código fallará, normalmente con un `SyntaxError` o `AttributeError`.
+
+## Cambios recientes importantes
+
+| Versión | Año | Cambio o mejora principal |
+|:---:|:---:|---|
+| **3.8** | 2019 | El operador "morsa" (`:=`) para asignación dentro de expresiones. |
+| **3.9** | 2020 | Operadores nativos para unir diccionarios (`|` y `|=`). |
+| **3.10** | 2021 | *Pattern matching* con bloques `match` / `case`. |
+| **3.11** | 2022 | **Gran salto de velocidad** (10-60% más rápido) y mejores mensajes de error. |
+| **3.12** | 2023 | Limpieza profunda: eliminación de docenas de módulos estándar obsoletos. |
+
+## Avisos de Deprecación (DeprecationWarning)
+
+Cuando los desarrolladores de Python o de librerías (como NumPy/Pandas) planean eliminar una función en el futuro, no la borran de golpe. Primero lanzan una advertencia.
+
+Al programar, es muy común encontrarte con este *warning*:
+```text
+DeprecationWarning: Function 'np.float' is deprecated. 
+It will be removed in numpy 1.24. Use 'float' instead.
+```
+
+. . .
+
+**¿Qué significa?**
+Significa: *"Esto funciona hoy, pero en la próxima versión va a desaparecer. ¡Actualiza tu código!"*. Si ignoras estos avisos, eventualmente tu código se romperá al actualizar el entorno.
+
+## Errores de incompatibilidad de versión
+
+¿Qué pasa si tienes un Python muy nuevo (ej. 3.12) e intentas usar un paquete viejo (ej. de 2021) que nadie ha actualizado?
+
+```text
+ERROR: Could not find a version that satisfies the requirement paquete_antiguo
+```
+
+**¿Por qué pasa esto?**
+Cuando usas `pip install`, Python busca en PyPI archivos instaladores pre-compilados (*wheels*) específicos para **tu versión exacta** de Python. Si el creador del paquete nunca lo compiló para Python 3.12, fallará. La solución es crear un entorno con una versión más antigua (ej. Python 3.9).
+
+## ¿Cómo instalar una versión específica de Python?
+
+::: {.panel-tabset}
+
+### pyenv (recomendado Linux/Mac)
+
+```bash
+# 1. Instalar pyenv
+curl https://pyenv.run | bash
+
+# 2. Ver versiones disponibles
+pyenv install --list | grep "3\."
+
+# 3. Instalar una versión específica
+pyenv install 3.10.14
+pyenv install 3.12.3
+
+# 4. Usarla globalmente o solo en un proyecto
+pyenv global 3.12.3          # para toda la máquina
+pyenv local 3.10.14          # solo en esta carpeta → crea .python-version
+```
+
+### conda
+
+```bash
+# conda puede crear entornos con cualquier versión de Python
+conda create -n snopy_env python=3.10
+conda activate snopy_env
+python --version  # → Python 3.10.x
+```
+
+### Windows
+
+```bash
+# Opción 1: pyenv-win
+pip install pyenv-win --target $HOME\.pyenv
+
+# Opción 2: descargar directamente de python.org
+# https://www.python.org/downloads/
+# El instalador permite tener varias versiones en paralelo
+```
+
+:::
+
+## Ver versiones instaladas y cambiar entre ellas
+
+```bash
+# Con pyenv — ver todo lo que tienes instalado
+pyenv versions
+#   system
+#   3.10.14
+# * 3.12.3 (set by /home/user/.pyenv/version)
+
+# Crear un entorno con una versión específica
+pyenv local 3.10.14
+python -m venv entorno_snopy   # usa Python 3.10 automáticamente
+
+# Con conda — especificar al crear
+conda create -n mi_proyecto python=3.10.14
+```
+
+::: {.callout-tip}
+`pyenv local` crea un archivo `.python-version` en la carpeta del proyecto. Commitéalo — así todos los colaboradores usan la misma versión de Python.
+:::
+
+## Caso real: SNooPy + NumPy
+
+SNooPy (curvas de luz de supernovas) asume que existe `numpy.float`.
+
+`numpy` lo eliminó en la versión 1.24.
+
+```
+AttributeError: module 'numpy' has no attribute 'float'
+```
+
+. . .
+
+**Solución:**
+
+```bash
+python -m venv entorno_snopy
+source entorno_snopy/bin/activate
+pip install "numpy<1.24"
+pip install snpy
+```
+
+::: {.callout-tip}
+Revisa `setup.cfg` o `pyproject.toml` del paquete para ver sus restricciones declaradas de versión.
+:::
+
+## El problema de `pickle`
+
+`pickle` serializa objetos Python → archivos `.pkl`
+
+**El formato NO es completamente compatible entre versiones.**
+
+```python
+# Guardado con Python 3.8
+pickle.dump(mi_objeto, f)
+
+# Abierto con Python 3.12 → puede fallar
+pickle.load(f)  # ← UnicodeDecodeError o AttributeError
+```
+
+. . .
+
+**Usa en cambio:**
+
+| Tipo de dato | Formato recomendado |
+|---|---|
+| Arrays | `.npy` / `.npz` (numpy) |
+| Datos astronómicos | `.fits` (astropy) |
+| Tablas | `.parquet` / `.csv` (pandas) |
+| Estructuras simples | `.json` |
+
+
+
+# El Ecosistema de Herramientas
+
+## ¿Por qué hay tantas herramientas?
+
+El ecosistema de Python ha crecido enormemente. Hoy existen múltiples herramientas que resuelven partes distintas del mismo problema. 
+
+Podemos dividirlas en **3 categorías**:
+1. Gestión de **versiones de Python**.
+2. Gestión de **entornos virtuales**.
+3. Gestión de **paquetes** (instalación).
+
+. . .
+
+Veamos el panorama general para entender dónde encaja cada pieza.
+
+## Comparativa general de herramientas
+
+| Herramienta | ¿Instala Python? | ¿Crea Entornos? | ¿Instala Paquetes? | Enfoque Principal |
+|---|:---:|:---:|:---:|---|
+| **pyenv** | ✅ Sí | ❌ No | ❌ No | Cambiar entre Python 3.9, 3.10, etc. |
+| **venv** | ❌ No | ✅ Sí | ❌ No | Crear la "burbuja" estándar (nativo). |
+| **pip** | ❌ No | ❌ No | ✅ Sí (PyPI) | Instalar librerías de Python. |
+| **conda** | ✅ Sí | ✅ Sí | ✅ Sí (Binarios)| Todo en uno, ideal ciencias (pesado). |
+| **poetry** | ❌ No | ✅ Sí | ✅ Sí (PyPI) | Desarrollo avanzado y empaquetado. |
+| **uv** | ✅ Sí | ✅ Sí | ✅ Sí (PyPI) | Todo en uno moderno, ultrarrápido. |
+
+## pip/venv vs conda: ¿Cuál elegir?
+
+**Usa `pip` + `venv` (o `uv`) si:**
+- Tu código es principalmente Python puro.
+- Necesitas entornos ligeros y muy rápidos.
+- Quieres seguir los estándares nativos.
+
+**Usa `conda` si:**
+- Estás en **Astrofísica** o **Ciencia de Datos**.
+- Necesitas paquetes pesados que dependen de C/Fortran (ej. GDAL, HDF5).
+- No quieres lidiar con errores de compilación del sistema.
+
+# Verificar tu instalación
+
+## ¿Qué tenemos instalado?
+
+::: {.panel-tabset}
+
+### pip / venv
+
+```bash
+python --version
+pip --version
+```
+
+### conda
+
+```bash
+conda --version
+python --version
+```
+
+:::
+
+::: {.callout-warning}
+Si `python` no se encuentra, prueba `python3`.
+Si `conda` no responde, ejecuta `conda init bash` y reinicia la terminal.
+:::
+
+# Crear y gestionar entornos
+
+## Crear un entorno
+
+::: {.panel-tabset}
+
+### pip / venv
+
+```bash
+python -m venv nombre_entorno
+```
+
+### conda
+
+```bash
+conda create -n nombre_entorno python=3.12
+```
+
+:::
+
+## Activar y desactivar
+
+::: {.panel-tabset}
+
+### pip / venv
+
+```bash
+# macOS / Linux
+source nombre_entorno/bin/activate
+
+# Windows PowerShell
+nombre_entorno\Scripts\Activate.ps1
+
+# Desactivar
+deactivate
+```
+
+### conda
+
+```bash
+# Activar
+conda activate nombre_entorno
+
+# Desactivar
+conda deactivate
+```
+
+:::
+
+::: {.callout-tip}
+El nombre del entorno aparece al inicio del prompt cuando está activo: `(nombre_entorno) $`
+:::
+
+## Eliminar un entorno
+
+::: {.panel-tabset}
+
+### pip / venv
+
+```bash
+# simplemente borra la carpeta
+rm -rf nombre_entorno
+```
+
+### conda
+
+```bash
+conda remove -n nombre_entorno --all
+```
+
+:::
+
+::: {.callout-warning}
+**Windows PowerShell:** si no puedes activar, ejecuta una vez como administrador:
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+:::
+
+# Instalar y controlar paquetes
+
+## Instalar paquetes
+
+::: {.panel-tabset}
+
+### pip / venv
+
+```bash
+pip install numpy                      # última versión
+pip install numpy==1.26.4             # versión exacta
+pip install "numpy>=2.0,<3.0"         # rango
+```
+
+### conda
+
+```bash
+conda install numpy                    # última versión
+conda install numpy=1.26.4            # versión exacta
+```
+
+:::
+
+## Explorar paquetes instalados
+
+::: {.panel-tabset}
+
+### pip / venv
+
+```bash
+pip list          # todos los paquetes
+pip show numpy    # detalle de uno
+pip uninstall numpy
+```
+
+### conda
+
+```bash
+conda list        # todos los paquetes
+conda search numpy
+conda remove numpy
+```
+
+:::
+
+::: {.callout-warning}
+Siempre instala con el **entorno activo**. De lo contrario el paquete va al sistema base.
+:::
+
+## El error más temido (y común)
+
+Si olvidas activar el entorno o si olvidaste instalar el paquete, Python te detendrá con este error:
+
+```python
+>>> import astropy
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+ModuleNotFoundError: No module named 'astropy'
+```
+
+. . .
+
+**¿Cómo se soluciona?**
+1. Verifica que el entorno correcto está activo en tu terminal (debe decir `(mi_entorno)`).
+2. Si usas Jupyter o VS Code, asegúrate de que el **kernel/intérprete** seleccionado sea el de tu entorno.
+3. Instala la librería: `pip install astropy`.
+
+# Canales de conda y actualizaciones
+
+## ¿Qué es un canal de conda?
+
+Cuando haces `conda install numpy`, conda busca en un **canal** — un repositorio remoto de paquetes compilados.
+
+. . .
+
+El canal por defecto (`defaults`) lo mantiene Anaconda Inc.
+
+**El más importante para ciencia y astronomía:**
+
+> `conda-forge` — mantenido por la comunidad, más paquetes, versiones más recientes
+
+## conda-forge en práctica
+
+**Instalar desde conda-forge:**
+```bash
+conda install -c conda-forge astropy photutils reproject
+```
+
+**Configurarlo como canal prioritario (recomendado):**
+```bash
+conda config --add channels conda-forge
+conda config --set channel_priority strict
+```
+
+Con `strict`, conda siempre prefiere `conda-forge` sobre `defaults`.
+
+```bash
+conda config --show channels
+# channels:
+#   - conda-forge   ← primero
+#   - defaults
+```
+
+## Canales relevantes para astronomía
+
+| Canal | Contenido |
+|-------|-----------|
+| `conda-forge` | paquetes científicos, versiones recientes |
+| `astropy` | `astroquery`, `specutils`, ecosistema Astropy |
+| `bioconda` | bioinformática |
+
+::: {.callout-warning}
+## Mezclar pip y conda
+
+Dentro de un entorno conda, usa primero `conda install` y **al final** `pip install` para lo que no esté en conda. Mezclarlos al revés puede crear conflictos difíciles de resolver.
+:::
+
+## Actualizar paquetes
+
+::: {.panel-tabset}
+
+### pip / venv
+
+```bash
+# Ver qué tiene actualizaciones
+pip list --outdated
+
+# Actualizar uno
+pip install --upgrade numpy
+
+# Actualizar pip mismo
+pip install --upgrade pip
+```
+
+### conda
+
+```bash
+# Actualizar uno
+conda update numpy
+
+# Actualizar todo el entorno
+conda update --all
+
+# Actualizar conda mismo
+conda update conda
+```
+
+:::
+
+## Fijar versiones para evitar actualizaciones
+
+A veces NO quieres que un paquete se actualice (caso SNooPy):
+
+::: {.panel-tabset}
+
+### pip
+
+```
+# requirements.txt
+numpy>=1.21,<1.24    # fijado por compatibilidad con SNooPy
+```
+
+### conda
+
+```bash
+# Crear archivo pinned en el entorno activo
+echo "numpy 1.23.*" >> $CONDA_PREFIX/conda-meta/pinned
+
+# O al configurar conda
+conda config --add pinned_packages numpy=1.23
+```
+
+:::
+
+::: {.callout-tip}
+Antes de actualizar en producción, prueba en un entorno copia. Si todo funciona, actualiza `requirements.txt` con las nuevas versiones.
+:::
+
+# Compartir dependencias
+
+## Exportar dependencias
+
+::: {.panel-tabset}
+
+### pip / venv
+
+```bash
+pip freeze > requirements.txt
+```
+
+```
+numpy==2.3.0
+matplotlib==3.10.3
+pandas==2.3.0
+```
+
+### conda
+
+```bash
+# Exportar todo
+conda env export > environment.yml
+
+# Solo lo que instalaste tú (más portable)
+conda env export --from-history > environment.yml
+```
+
+:::
+
+## Anatomía de un `requirements.txt`
+
+```
+# Paquetes que instalamos nosotros
+numpy==1.26.4
+matplotlib==3.9.2
+astropy==6.1.0
+
+# Dependencias transitivas (instaladas automáticamente)
+contourpy==1.2.1      # numpy la necesita
+erfa==2.0.1.1         # astropy la necesita
+python-dateutil==2.9.0
+```
+
+. . .
+
+`pip freeze` **mezcla todo** — los tuyos y los de tus paquetes.
+
+## Sintaxis de versiones en pip
+
+| Operador | Significado | Ejemplo |
+|----------|-------------|---------|
+| `==` | exacta | `numpy==1.26.4` |
+| `>=` | mínimo | `numpy>=1.26` |
+| `!=` | excluir | `numpy!=1.24.0` |
+| `~=` | compatible | `numpy~=1.26.0` |
+| `,` | combinar | `numpy>=1.26,<2.0` |
+
+```
+# requirements.txt escrito a mano (más flexible)
+numpy>=1.26,<2.0     # compatible con SNooPy
+astropy>=6.0
+matplotlib>=3.8
+```
+
+## Recrear el entorno
+
+::: {.panel-tabset}
+
+### pip / venv
+
+```bash
+# 1. Crear y activar entorno nuevo
+python -m venv mi_proyecto
+source mi_proyecto/bin/activate
+
+# 2. Instalar desde archivo
+pip install -r requirements.txt
+```
+
+### conda
+
+```bash
+conda env create -f environment.yml
+conda activate mi_proyecto
+```
+
+:::
+
+::: {.callout-warning}
+`pip freeze` sin entorno activo exporta **todo** el sistema. Siempre activa el entorno antes.
+:::
+
+# Buenas prácticas
+
+## ¿Qué va en git?
+
+```
+mi_proyecto/
+├── .gitignore          ✅ sí
+├── requirements.txt    ✅ sí
+├── environment.yml     ✅ sí (si usas conda)
+├── src/
+│   └── mi_script.py   ✅ sí
+└── venv/               ❌ NO (pesa mucho y es reproducible)
+```
+
+## .gitignore mínimo
+
+```gitignore
+# Entornos virtuales
+venv/
+.venv/
+env/
+nuevo_ambiente/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Python cache
+__pycache__/
+*.pyc
+```
+
+## Checklist por proyecto
+
+- [ ] Crear un entorno dedicado al proyecto
+- [ ] Activar antes de instalar cualquier cosa
+- [ ] Commitear `requirements.txt` o `environment.yml`
+- [ ] Agregar el entorno al `.gitignore`
+- [ ] Documentar la versión de Python en el README
+- [ ] Registrar el entorno como kernel de Jupyter
+
+# Integración con Editores de Código (¡Urgente!)
+
+## VS Code
+
+Si usas VS Code, debes indicarle manualmente qué entorno usar. Si no lo haces, seguirá usando el Python global y marcará errores.
+
+1. Abre la paleta de comandos (`Ctrl+Shift+P` o `Cmd+Shift+P`).
+2. Escribe y selecciona **`Python: Select Interpreter`**.
+3. Selecciona la ruta de tu entorno virtual.
+
+. . . 
+
+¡Ahora la terminal integrada de VS Code activará el entorno automáticamente!
+
+## Kernel en Jupyter
+
+Si usas notebooks, necesitas registrar tu entorno como **kernel** — de lo contrario Jupyter usa el Python del sistema sin avisarte.
+
+```bash
+# Con el entorno activo
+pip install ipykernel
+python -m ipykernel install --user \
+  --name mi_proyecto \
+  --display-name "Python (mi_proyecto)"
+```
+
+. . .
+
+Luego, abre tu notebook y selecciona el kernel en la esquina superior derecha.
+
+::: {.callout-warning}
+`import numpy` puede traer la versión del sistema sin ningún error visible si olvidaste este paso. Siempre verifica el kernel activo.
+:::
+
+# Troubleshooting
+
+## ¿Qué hacer si un entorno se rompe?
+
+A veces, al instalar muchas cosas (o mezclar pip y conda), los paquetes generan conflictos incurables o el entorno deja de funcionar.
+
+. . .
+
+> **La solución de oro:**
+> "No intentes repararlo, bórralo y vuelve a crearlo desde el `requirements.txt` (o `environment.yml` si usas conda)."
+
+. . .
+
+Esta es la **mayor ventaja** de los entornos virtuales y casi no se resalta como una solución a problemas. 
+Si algo se rompe irremediablemente: elimina la carpeta (o `conda remove -n env --all`) y reinstala limpio en un par de minutos.
+
+## Limpiar disco en Conda (Caché)
+
+Conda descarga binarios pesados que se acumulan con el tiempo y pueden llenar tu disco duro rápidamente.
+
+. . .
+
+**Tip para liberar espacio (Gigabytes):**
+```bash
+conda clean --all
+```
+Esto borra los instaladores cacheados antiguos **sin dañar** tus entornos activos.
+
+# Herramientas avanzadas
+
+## Poetry
+
+Unifica entorno + dependencias + publicación en una sola herramienta.
+
+| Tarea | pip/venv | Poetry |
+|---|---|---|
+| Crear proyecto | `mkdir + python -m venv` | `poetry new proyecto` |
+| Activar | `source venv/bin/activate` | `poetry shell` |
+| Instalar | `pip install numpy` | `poetry add numpy` |
+| Deps de dev | manual | `poetry add --group dev pytest` |
+| Exportar | `pip freeze` | automático en `pyproject.toml` |
+
+## Anatomía de un `pyproject.toml`
+
+```toml
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "mi-pipeline"
+version = "0.1.0"
+python = "^3.12"
+
+[tool.poetry.dependencies]   # lo que TÚ pediste
+numpy = "^1.26"
+astropy = "^6.1"
+scipy = "^1.13"
+
+[tool.poetry.group.dev.dependencies]  # solo en desarrollo
+pytest = "^8.0"
+jupyter = "^1.0"
+```
+
+. . .
+
+`^1.26` = compatible: `>=1.26.0, <2.0.0`
+
+## `pyproject.toml` vs `requirements.txt`
+
+|  | `requirements.txt` | `pyproject.toml` + `poetry.lock` |
+|--|---|---|
+| Versiones | exactas o manuales | tú defines rangos, Poetry resuelve |
+| Deps transitivas | mezcladas con las tuyas | separadas automáticamente |
+| Deps de dev | archivo separado | grupo `dev` integrado |
+| Lock file | no | `poetry.lock` (commitear ambos) |
+| Estándar | legacy | moderno (PEP 517/518) |
+
+## uv
+
+Alternativa ultrarrápida a `pip` escrita en Rust. 10-100x más rápido.
+
+```bash
+# Instalación
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Uso (compatible con pip)
+uv pip install numpy
+uv pip install -r requirements.txt
+uv venv mi_entorno
+```
+
+Compatible con `requirements.txt` y `pyproject.toml`.
+
+# Referencia rápida
+
+## Cheatsheet
+
+| Tarea | pip / venv | conda |
+|---|---|---|
+| Crear | `python -m venv env` | `conda create -n env python=3.12` |
+| Activar (Linux/Mac) | `source env/bin/activate` | `conda activate env` |
+| Activar (Windows) | `env\Scripts\activate` | `conda activate env` |
+| Desactivar | `deactivate` | `conda deactivate` |
+| Instalar | `pip install pkg` | `conda install pkg` |
+| Ver instalados | `pip list` | `conda list` |
+| Exportar | `pip freeze > requirements.txt` | `conda env export > environment.yml` |
+| Recrear | `pip install -r requirements.txt` | `conda env create -f environment.yml` |
+| Eliminar | `rm -rf env/` | `conda remove -n env --all` |
